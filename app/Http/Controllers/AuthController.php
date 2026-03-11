@@ -37,7 +37,7 @@ class AuthController extends Controller
         //Iniciar sesión de forma automática
         Auth::login($user);
 
-        return redirect()->route('productos.index');
+        return redirect()->route('productos.index')->with('success', '¡Registro exitoso! Bienvenido ' . $user->name);
 
     }
 
@@ -59,13 +59,11 @@ class AuthController extends Controller
         // Obtener información de la sesión y generar sus credenciales
         $request -> session()->regenerate();
         // Redireccionar al usuario con su sesión iniciada
-        return redirect()->route('productos.index');
+        return redirect()->route('productos.index')->with('success', '¡Bienvenido de nuevo!');
     }
 
     // Si los datos son incorrectos, mandar un error
-    return back()->withErrors([
-        'email' => 'Datos incorrectos'
-    ]);
+    return back()->with('error', 'Credenciales incorrectas. Por favor, verifica tu correo y contraseña.');
 
     }
 
@@ -79,7 +77,7 @@ class AuthController extends Controller
         $request -> session() -> invalidate();
         $request -> session() -> regenerateToken();
 
-        return redirect('/acceso');
+        return redirect('/acceso')->with('info', 'Has cerrado sesión correctamente');
 
     }
 

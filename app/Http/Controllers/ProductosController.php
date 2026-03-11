@@ -29,6 +29,15 @@ class ProductosController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'nombre' => 'required',
+            'precio' => 'required|numeric|min:0',
+            'descripcion' => 'required',
+            'color' => 'required',
+            'imagen' => 'required',
+            'stock' => 'required|integer|min:0'
+        ]);
+
         ProductosModel::create([
             'nombre' => $request->nombre,
             'precio' => $request->precio,
@@ -38,7 +47,7 @@ class ProductosController extends Controller
             'stock' => $request->stock
         ]);
 
-        return redirect()->route('productos.create');
+        return redirect()->route('productos.create')->with('success', 'Producto registrado correctamente');
     }
 
     /**
@@ -71,7 +80,7 @@ class ProductosController extends Controller
 
         $producto->update($request->all());
 
-        return redirect()->route('productos.index');
+        return redirect()->route('productos.index')->with('success', 'Producto actualizado correctamente');
     }
 
     /**

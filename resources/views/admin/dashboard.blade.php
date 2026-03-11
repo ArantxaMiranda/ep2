@@ -8,6 +8,8 @@
 <body>
     @extends('layouts.app')
     @section('content')
+        @include('partials.alerts')
+        
         <h1>PANEL DE ADMINISTRADOR</h1>
     @endsection
 </body>
