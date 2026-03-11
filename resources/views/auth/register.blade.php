@@ -9,7 +9,21 @@
     @extends('layouts.app')
     @section('content')
 
+    @include('partials.alerts')
+
     <h1>REGISTRO DE USUARIO</h1>
+
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>¡Error!</strong> Por favor corrige los siguientes errores:
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
     <form action="{{  route('registro.store') }}" method="POST">
 

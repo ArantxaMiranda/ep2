@@ -9,7 +9,19 @@
     @extends('layouts.app')
     @section('content')
 
+        @include('partials.alerts')
+
         <h1>INICIO DE SESIÓN</h1>
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>¡Error!</strong>
+                @foreach ($errors->all() as $error)
+                    {{ $error }}
+                @endforeach
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
         
         <form action="{{ route('acceso.store') }}" method="POST">

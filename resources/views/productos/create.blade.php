@@ -11,7 +11,22 @@
 
     @section('content')
 
+    @include('partials.alerts')
+
     <h1>REGISTRAR PRODUCTO</h1>
+
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <strong class="mx-2">¡Error!</strong> Por favor corrige los siguientes errores:
+            <ul class="mb-0 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
     <div class="d-flex justify-content-end mb-2">
         <a href="{{ route('productos.index') }}">
