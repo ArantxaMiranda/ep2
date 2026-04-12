@@ -41,8 +41,8 @@
         <br>
 
         <div class="form-check">
-            <input type="checkbox" name="is_admin" value="1">
-            <label>Es administrador</label>
+            <input type="checkbox" name="is_admin" value="1" class="form-check-input" id="is_admin">
+            <label class="form-check-label" for="is_admin">Es administrador</label>
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>

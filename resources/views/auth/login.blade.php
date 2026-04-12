@@ -25,7 +25,7 @@
 
         
         <form action="{{ route('acceso.store') }}" method="POST">
-            @csrf 
+            @csrf
 
             <input type="email" name="email" placeholder="Correo" class="form-control" required>
             <br>
