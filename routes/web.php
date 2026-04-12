@@ -2,11 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductosController;
-Use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [ProductosController::class, 'home'])->name('home');
 
 // Ruta para obtener los métodos de ProductosController
 Route::resource('productos', ProductosController::class);
@@ -45,7 +43,27 @@ Route::post('/acceso', [
 // Ruta para cerrar sesión
 Route::post('/cerrar', [
     AuthController::class, 'logout'
-])->name('cerrar'); 
+])->name('cerrar');
+
+// Nuevas rutas para la sección de ventas
+Route::middleware(['auth'])->group(function () {
+    Route::get('/favoritos', function () {
+        return view('ventas.favoritos');
+    })->name('favoritos');
+
+    Route::get('/mis-compras', function () {
+        return view('ventas.compras');
+    })->name('compras');
+
+    Route::get('/carrito', function () {
+        return view('ventas.carrito');
+    })->name('carrito');
+});
+
+// Rutas públicas de catálogo
+Route::get('/catalogo', [ProductosController::class, 'catalogo'])->name('catalogo');
+Route::get('/ropa', [ProductosController::class, 'ropa'])->name('ropa');
+Route::get('/calzado', [ProductosController::class, 'calzado'])->name('calzado');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin-dashboard', [

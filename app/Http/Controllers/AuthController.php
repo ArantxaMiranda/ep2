@@ -8,8 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller
-{
+class AuthController extends Controller{
     public function registerForm(){
         return view('auth.register');
     }
@@ -22,7 +21,7 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users',
             'phone' => 'required',
             'password' => 'required|confirmed|min: 8',
-    ]);
+        ]);
 
         // Guardar la información en la base de datos
         $user = User::create([
@@ -38,7 +37,6 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect()->route('productos.index')->with('success', '¡Registro exitoso! Bienvenido ' . $user->name);
-
     }
 
     // Método para regresar vista de inicio de sesión
@@ -48,28 +46,25 @@ class AuthController extends Controller
 
     // Método para iniciar sesión
     public function login(Request $request){
+        $data = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-    $data = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+        // Realizar intento de inicio de sesión
+        if(Auth::attempt($data)){
+            // Obtener información de la sesión y generar sus credenciales
+            $request -> session()->regenerate();
+            // Redireccionar al usuario con su sesión iniciada
+            return redirect()->route('home')->with('success', '¡Bienvenido de nuevo!');
+        }
 
-    // Realizar intento de inicio de sesión
-    if(Auth::attempt($data)){
-        // Obtener información de la sesión y generar sus credenciales
-        $request -> session()->regenerate();
-        // Redireccionar al usuario con su sesión iniciada
-        return redirect()->route('productos.index')->with('success', '¡Bienvenido de nuevo!');
-    }
-
-    // Si los datos son incorrectos, mandar un error
-    return back()->with('error', 'Credenciales incorrectas. Por favor, verifica tu correo y contraseña.');
-
+        // Si los datos son incorrectos, mandar un error
+        return back()->with('error', 'Credenciales incorrectas. Por favor, verifica tu correo y contraseña.');
     }
 
     // Método para cerrar sesión e invalidar las credenciales
     public function logout(Request $request){
-       
         // Cerrar sesión
         Auth::logout();
         
@@ -77,8 +72,7 @@ class AuthController extends Controller
         $request -> session() -> invalidate();
         $request -> session() -> regenerateToken();
 
-        return redirect('/acceso')->with('info', 'Has cerrado sesión correctamente');
-
+        return redirect('/')->with('info', 'Has cerrado sesión correctamente');
     }
 
     // Panel principal del administrador
