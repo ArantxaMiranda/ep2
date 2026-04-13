@@ -8,6 +8,7 @@ use App\Models\ProductosModel;
 
 class ProductosController extends Controller{
     const API_BASE_URL = 'https://api.escuelajs.co/api/v1/products';
+    const API_CATEGORIES_URL = 'https://api.escuelajs.co/api/v1/categories';
 
     public function index(){
         $productos = ProductosModel::all();
@@ -40,12 +41,9 @@ class ProductosController extends Controller{
         return redirect()->route('admin.productos.create')->with('success', 'Producto registrado correctamente');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        // No implementado, ya que no se requiere una vista individual para cada producto en el panel admin
     }
 
     public function edit(ProductosModel $producto){
@@ -91,22 +89,35 @@ class ProductosController extends Controller{
         return redirect()->route('admin.productos.index')->with('success', 'Productos importados/sincronizados correctamente');
     }
 
+    private function getCategoryIds() {
+        $categoriesResponse = Http::withoutVerifying()->get(self::API_CATEGORIES_URL)->json() ?? [];
+        $ids = ['ropa' => 1, 'calzado' => 4]; // Fallbacks históricos
+
+        foreach($categoriesResponse as $cat) {
+            if(isset($cat['name'])) {
+                $name = strtolower($cat['name']);
+                if($name == 'clothes') {
+                    $ids['ropa'] = $cat['id'];
+                } elseif($name == 'shoes') {
+                    $ids['calzado'] = $cat['id'];
+                }
+            }
+        }
+        return $ids;
+    }
+
     public function home(){
-        // Sección de Ropa (Clothes)
+        $ids = $this->getCategoryIds();
+
         $ropa = Http::withoutVerifying()->get(self::API_BASE_URL, [
-            'categoryId' => 1,
-            'limit' => 10,
+            'categoryId' => $ids['ropa'],
+            'limit' => 6,
         ])->json() ?? [];
 
-        $ropa = array_slice($ropa, 0, 10);
-
-        // Sección de Zapatos o Accesorios (Shoes)
         $accesorios = Http::withoutVerifying()->get(self::API_BASE_URL, [
-            'categoryId' => 4,
-            'limit' => 10,
+            'categoryId' => $ids['calzado'],
+            'limit' => 6,
         ])->json() ?? [];
-
-        $accesorios = array_slice($accesorios, 0, 10);
 
         return view('productos.home', compact('ropa', 'accesorios'));
     }
@@ -119,8 +130,10 @@ class ProductosController extends Controller{
 
     public function ropa()
     {
+        $ids = $this->getCategoryIds();
+        
         $ropa = Http::withoutVerifying()->get(self::API_BASE_URL, [
-            'categoryId' => 1,
+            'categoryId' => $ids['ropa'],
             'limit' => 20,
         ])->json() ?? [];
 
@@ -129,8 +142,10 @@ class ProductosController extends Controller{
 
     public function calzado()
     {
+        $ids = $this->getCategoryIds();
+
         $calzado = Http::withoutVerifying()->get(self::API_BASE_URL, [
-            'categoryId' => 4,
+            'categoryId' => $ids['calzado'],
             'limit' => 20,
         ])->json() ?? [];
 
@@ -146,7 +161,6 @@ class ProductosController extends Controller{
             $importados = 0;
 
             foreach ($productosAPI as $item) {
-                // Usamos updateOrCreate para evitar duplicados basados en api_id
                 ProductosModel::updateOrCreate(
                     ['api_id' => $item['id']],
                     [
@@ -155,7 +169,7 @@ class ProductosController extends Controller{
                         'descripcion' => $item['description'],
                         'categoria'   => $item['category']['name'] ?? 'General',
                         'imagen'      => $item['images'][0] ?? null,
-                        'stock'       => rand(10, 50), // Stock aleatorio inicial
+                        'stock'       => rand(10, 50),
                     ]
                 );
                 $importados++;
@@ -168,4 +182,3 @@ class ProductosController extends Controller{
         return redirect()->back()->with('error', 'No se pudo conectar con la API de productos.');
     }
 }
-
