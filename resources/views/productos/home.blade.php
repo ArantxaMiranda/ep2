@@ -18,9 +18,10 @@
                 <a href="{{ route('home') }}"><i class="fa-solid fa-house me-2"></i> Inicio</a>
                 <a href="{{ auth()->check() ? route('favoritos') : route('acceso') }}"><i class="fa-solid fa-heart me-2"></i> Favoritos</a>
                 <a href="{{ auth()->check() ? route('compras') : route('acceso') }}"><i class="fa-solid fa-bag-shopping me-2"></i> Mis Compras</a>
-                <a href="#"><i class="fa-solid fa-magnifying-glass me-2"></i> Explorar</a>
                 @auth
-                    <a href="{{ route('productos.index') }}"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
+                    @if(auth()->user()->is_admin)
+                        <a href="{{ route('admin-dashboard') }}"><i class="fa-solid fa-gauge me-2"></i> Dashboard Administrador</a>
+                    @endif
                 @endauth
             </nav>
             
@@ -53,15 +54,37 @@
                         Encuentra las mejores prendas y accesorios <br>
                         para que luzcas increíble en cualquier ocasión.
                     </p>
-                    <button class="more-btn">Ver Catálogo</button>
                 </div>
                 <div class="products">
                     @foreach ($ropa as $producto)
-                        <button class="product" onclick="alert('¡Producto añadido al carrito!')">
-                            <img src="{{ $producto['images'][0] ?? ''}}" alt="{{ $producto['title'] ?? 'Prenda de ropa' }}">
-                            <h4>{{ $producto['title'] ?? 'Sin título' }}</h4>
-                            <p>${{ number_format($producto['price'] ?? 0, 2) }}</p>
-                        </button>
+                        <div class="product shadow-sm border p-3 rounded-4 bg-white mb-4 d-inline-block text-center" style="width: 250px; margin: 10px; transition: transform 0.3s; position: relative;">
+                            <img src="{{ $producto['images'][0] ?? ''}}" alt="{{ $producto['title'] ?? 'Prenda de ropa' }}" class="img-fluid rounded-4 mb-3" style="height: 150px; object-fit: contain;">
+                            <h4 class="h6 fw-bold mb-2">{{ $producto['title'] ?? 'Sin título' }}</h4>
+                            <p class="h5 fw-bold text-primary mb-3">${{ number_format($producto['price'] ?? 0, 2) }}</p>
+                            
+                            <!-- Acciones adicionales -->
+                            <div class="d-flex flex-column gap-2 mt-3">
+                                <form action="{{ route('favoritos.agregar') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="api_id" value="{{ $producto['id'] }}">
+                                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill btn-sm shadow-sm py-2">
+                                        <i class="fa-solid fa-heart me-1"></i> Favoritos
+                                    </button>
+                                </form>
+                                
+                                <form action="{{ route('carrito.agregar') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="api_id" value="{{ $producto['id'] }}">
+                                    <div class="input-group input-group-sm mb-2 shadow-sm border rounded-pill overflow-hidden bg-white">
+                                        <span class="input-group-text bg-light border-0 text-muted small px-3">Cant.</span>
+                                        <input type="number" name="cantidad" value="1" min="1" class="form-control border-0 text-center fw-bold" style="max-width: 60px;">
+                                    </div>
+                                    <button type="submit" class="btn btn-dark w-100 rounded-pill btn-sm shadow-sm py-2">
+                                        <i class="fa-solid fa-cart-shopping me-1"></i> Carrito
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             </section>
@@ -73,15 +96,37 @@
                         Explora las últimas tendencias en <br>
                         calzado deportivo y casual exclusivo.
                     </p>
-                    <button class="more-btn">Ver Colección</button>
                 </div>
                 <div class="products">
                     @foreach ($accesorios as $producto)
-                        <button class="product" onclick="alert('¡Producto añadido al carrito!')" style="cursor: pointer;">
-                            <img src="{{ $producto['images'][0] ?? ''}}" alt="{{ $producto['title'] ?? 'Calzado o accesorio' }}">
-                            <h4>{{ $producto['title'] ?? 'Sin título' }}</h4>
-                            <p>${{ number_format($producto['price'] ?? 0, 2) }}</p>
-                        </button>
+                        <div class="product shadow-sm border p-3 rounded-4 bg-white mb-4 d-inline-block text-center" style="width: 250px; margin: 10px; transition: transform 0.3s; position: relative;">
+                            <img src="{{ $producto['images'][0] ?? ''}}" alt="{{ $producto['title'] ?? 'Calzado o accesorio' }}" class="img-fluid rounded-4 mb-3" style="height: 150px; object-fit: contain;">
+                            <h4 class="h6 fw-bold mb-2">{{ $producto['title'] ?? 'Sin título' }}</h4>
+                            <p class="h5 fw-bold text-primary mb-3">${{ number_format($producto['price'] ?? 0, 2) }}</p>
+                            
+                            <!-- Acciones adicionales -->
+                            <div class="d-flex flex-column gap-2 mt-3">
+                                <form action="{{ route('favoritos.agregar') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="api_id" value="{{ $producto['id'] }}">
+                                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill btn-sm shadow-sm py-2">
+                                        <i class="fa-solid fa-heart me-1"></i> Favoritos
+                                    </button>
+                                </form>
+                                
+                                <form action="{{ route('carrito.agregar') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="api_id" value="{{ $producto['id'] }}">
+                                    <div class="input-group input-group-sm mb-2 shadow-sm border rounded-pill overflow-hidden bg-white">
+                                        <span class="input-group-text bg-light border-0 text-muted small px-3">Cant.</span>
+                                        <input type="number" name="cantidad" value="1" min="1" class="form-control border-0 text-center fw-bold" style="max-width: 60px;">
+                                    </div>
+                                    <button type="submit" class="btn btn-dark w-100 rounded-pill btn-sm shadow-sm py-2">
+                                        <i class="fa-solid fa-cart-shopping me-1"></i> Carrito
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             </section>

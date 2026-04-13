@@ -16,9 +16,10 @@
                 <a href="{{ route('home') }}"><i class="fa-solid fa-house me-2"></i> Inicio</a>
                 <a href="{{ route('favoritos') }}"><i class="fa-solid fa-heart me-2"></i> Favoritos</a>
                 <a href="{{ route('compras') }}"><i class="fa-solid fa-bag-shopping me-2"></i> Mis Compras</a>
-                <a href="#"><i class="fa-solid fa-magnifying-glass me-2"></i> Explorar</a>
                 @auth
-                    <a href="{{ route('productos.index') }}"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
+                    @if(auth()->user()->is_admin)
+                        <a href="{{ route('admin-dashboard') }}"><i class="fa-solid fa-gauge me-2"></i> Dashboard Administrador</a>
+                    @endif
                 @endauth
             </nav>
             <form action="{{ route('cerrar') }}" method="POST">
@@ -37,10 +38,60 @@
                     </a>
                 </div>
             </header>
-            <section class="hero">
-                <div class="hero-text">
+            <section class="hero d-block">
+                <div class="hero-text mb-4">
                     <h1>MIS FAVORITOS</h1>
                     <p>Aquí aparecerán las prendas que más te gustan.</p>
+                </div>
+
+                <div class="container-fluid">
+                    @include('partials.alerts')
+                    
+                    @if($favoritos->isEmpty())
+                        <div class="text-center py-5 bg-white rounded-4 shadow-sm">
+                            <i class="fa-solid fa-heart-crack fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">Aún no tienes favoritos</h4>
+                            <a href="{{ route('home') }}" class="btn btn-dark mt-3 rounded-pill px-4">Explorar productos</a>
+                        </div>
+                    @else
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                            @foreach($favoritos as $favorito)
+                                <div class="col">
+                                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
+                                        <div class="p-3">
+                                            <img src="{{ $favorito->producto->imagen }}" class="card-img-top rounded-3" alt="{{ $favorito->producto->nombre }}" style="height: 180px; object-fit: contain;">
+                                        </div>
+                                        <div class="card-body pt-0">
+                                            <h6 class="fw-bold mb-1 text-truncate">{{ $favorito->producto->nombre }}</h6>
+                                            <p class="text-primary fw-bold mb-3">${{ number_format($favorito->producto->precio, 2) }}</p>
+                                            
+                                            <div class="d-flex flex-column gap-2">
+                                                <form action="{{ route('carrito.agregar') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="api_id" value="{{ $favorito->producto->api_id }}">
+                                                    <div class="input-group input-group-sm mb-2 shadow-sm border rounded-pill overflow-hidden bg-white">
+                                                        <span class="input-group-text bg-light border-0 text-muted small px-3">Cant.</span>
+                                                        <input type="number" name="cantidad" value="1" min="1" class="form-control border-0 text-center fw-bold" style="max-width: 60px;">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-dark w-100 rounded-pill btn-sm shadow-sm py-2">
+                                                        <i class="fa-solid fa-cart-shopping me-1"></i> Carrito
+                                                    </button>
+                                                </form>
+                                                
+                                                <form action="{{ route('favoritos.destroy', $favorito->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill btn-sm shadow-sm py-2">
+                                                        <i class="fa-solid fa-trash me-1"></i> Eliminar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </section>
         </main>

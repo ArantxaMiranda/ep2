@@ -69,3 +69,28 @@
         }, 4000);
     </script>
 @endif
+
+{{-- Errores de Validación --}}
+@if ($errors->any())
+    <div id="alerta-validation" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <strong class="mx-2">¡Error!</strong> Corrige los siguientes campos:
+        <ul class="mb-0 mt-2 small">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            let alerta = document.getElementById('alerta-validation');
+            if(alerta) {
+                alerta.classList.remove('show');
+                alerta.classList.add('fade');
+                setTimeout(() => alerta.remove(), 500);
+            }
+        }, 6000);
+    </script>
+@endif
