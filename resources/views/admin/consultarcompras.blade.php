@@ -52,11 +52,6 @@
                                 <td class="text-end px-3 fw-bold text-primary">${{ number_format($compra->total, 2) }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-1 justify-content-center">
-                                        <!-- Botón de promociones (Sin acción por ahora) -->
-                                        <button type="button" class="btn btn-info btn-sm text-white" title="Enviar Notificación de Compra">
-                                            <i class="fa-solid fa-envelope"></i>
-                                        </button>
-
                                         <!-- Botón para eliminar venta -->
                                         <form action="{{ route('admin.compras.destroy', $compra->id) }}" method="POST" class="d-inline">
                                             @csrf

@@ -54,11 +54,6 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-1 justify-content-center">
-                                        <!-- Botón de promociones (sin acción real) -->
-                                        <button type="button" class="btn btn-info btn-sm text-white" title="Enviar Correo de Promoción">
-                                            <i class="fa-solid fa-envelope"></i>
-                                        </button>
-
                                         <!-- Botón para promover a admin con alert -->
                                         @if($usuario->role != 'admin')
                                         <form action="{{ route('admin.usuarios.promote', $usuario->id) }}" method="POST" class="d-inline">
