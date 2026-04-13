@@ -24,7 +24,7 @@ class AdminMiddleware{
 
         // Veridicar que la sesión sea de un administrador
         if(!Auth::user()->is_admin){
-            return redirect()->route('productos.index')
+            return redirect()->route('home')
             ->with('error', 'No cuentas con permisos de administrador');
         }
 

@@ -20,6 +20,7 @@ class AuthController extends Controller{
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'phone' => 'required',
+            'direccion' => 'nullable',
             'password' => 'required|confirmed|min: 8',
         ]);
 
@@ -28,6 +29,7 @@ class AuthController extends Controller{
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'direccion' => $request->direccion,
             'password' => Hash::make($request->password),
             'is_admin' => $request->has('is_admin'),
             // Uso de has() para el manejo del checkbox
@@ -36,7 +38,7 @@ class AuthController extends Controller{
         //Iniciar sesión de forma automática
         Auth::login($user);
 
-        return redirect()->route('productos.index')->with('success', '¡Registro exitoso! Bienvenido ' . $user->name);
+        return redirect()->route('home')->with('success', '¡Registro exitoso! Bienvenido ' . $user->name);
     }
 
     // Método para regresar vista de inicio de sesión
@@ -60,7 +62,7 @@ class AuthController extends Controller{
         }
 
         // Si los datos son incorrectos, mandar un error
-        return back()->with('error', 'Credenciales incorrectas. Por favor, verifica tu correo y contraseña.');
+        return back()->with('error', 'El correo o la contraseña son incorrectos. Inténtalo de nuevo.');
     }
 
     // Método para cerrar sesión e invalidar las credenciales
@@ -78,5 +80,28 @@ class AuthController extends Controller{
     // Panel principal del administrador
     public function adminDashboard(){
         return view('admin.dashboard');
+    }
+
+    public function consultarUsuarios()
+    {
+        $usuarios = User::all();
+        return view('admin.consultarusuarios', compact('usuarios'));
+    }
+
+    public function promoteToAdmin($id)
+    {
+        $usuario = User::findOrFail($id);
+        $usuario->is_admin = '1'; // Asumiendo que existe una columna 'role' en la tabla users
+        $usuario->save();
+
+        return redirect()->back()->with('success', 'Usuario promovido a administrador correctamente.');
+    }
+
+    public function destroy($id)
+    {
+        $usuario = User::findOrFail($id);
+        $usuario->delete();
+
+        return redirect()->back()->with('success', 'Usuario eliminado correctamente.');
     }
 }

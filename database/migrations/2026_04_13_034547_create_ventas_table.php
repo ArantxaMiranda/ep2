@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('productos', function (Blueprint $table) {
-            // Campos a crear de la tabla en la BD
+        Schema::create('ventas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->decimal('precio');
-            $table->text('descripcion');
-            $table->string('categoria');
-            $table->string('imagen')->nullable();
-            $table->integer('stock');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('direccion');
+            $table->decimal('subtotal', 10, 2);
+            $table->decimal('envio', 10, 2);
+            $table->decimal('total', 10, 2);
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('productos');
+        Schema::dropIfExists('ventas');
     }
 };

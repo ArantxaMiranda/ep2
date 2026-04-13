@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class ProductosModel extends Model{
     protected $table = 'productos';
     protected $fillable = [
+        'api_id',
         'nombre',
         'precio',
         'descripcion',
-        'color',
+        'categoria',
         'imagen',
         'stock'
     ];

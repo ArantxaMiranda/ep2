@@ -3,21 +3,53 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\VentasController;
+use App\Http\Controllers\FavoritosController;
 
+// Rutas protegidas para el administrador
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AuthController::class, 'adminDashboard'])->name('admin-dashboard');
+    Route::get('/consultarusuarios', [AuthController::class, 'consultarUsuarios'])->name('consultarusuarios');
+    Route::delete('/usuarios/{id}', [AuthController::class, 'destroy'])->name('admin.usuarios.destroy');
+    Route::post('/usuarios/{id}/promote', [AuthController::class, 'promoteToAdmin'])->name('admin.usuarios.promote');
+    Route::get('/consultarcompras', [VentasController::class, 'consultarCompras'])->name('consultarcompras');
+    Route::delete('/eliminar-compra/{id}', [VentasController::class, 'eliminarCompra'])->name('admin.compras.destroy');
+    Route::get('/consultarproductos', [ProductosController::class, 'index'])->name('consultarproductos');
+
+    // Rutas de productos (Gestión administrativa)
+    Route::post('productos/importar', [ProductosController::class, 'importar'])->name('admin.productos.importar');
+    Route::resource('productos', ProductosController::class)->names([
+        'index' => 'admin.productos.index',
+        'create' => 'admin.productos.create',
+        'store' => 'admin.productos.store',
+        'edit' => 'admin.productos.edit',
+        'update' => 'admin.productos.update',
+        'destroy' => 'admin.productos.destroy',
+    ]);
+});
+
+// Rutas para usuarios autenticados
+Route::middleware(['auth'])->group(function () {
+    // Carrito
+    Route::get('/carrito', [VentasController::class, 'carrito'])->name('carrito');
+    Route::post('/carrito/agregar', [VentasController::class, 'agregarAlCarrito'])->name('carrito.agregar');
+    Route::delete('/carrito/{id}', [VentasController::class, 'eliminarDelCarrito'])->name('carrito.eliminar');
+    Route::post('/carrito/confirmar', [VentasController::class, 'confirmarCompra'])->name('carrito.confirmar');
+
+    // Favoritos
+    Route::get('/favoritos', [FavoritosController::class, 'index'])->name('favoritos');
+    Route::post('/favoritos/agregar', [FavoritosController::class, 'store'])->name('favoritos.agregar');
+    Route::delete('/favoritos/{id}', [FavoritosController::class, 'destroy'])->name('favoritos.destroy');
+
+    // Mis Compras
+    Route::get('/mis-compras', [VentasController::class, 'misCompras'])->name('compras');
+});
+
+// Rutas públicas de catálogo
 Route::get('/', [ProductosController::class, 'home'])->name('home');
-
-// Ruta para obtener los métodos de ProductosController
-Route::resource('productos', ProductosController::class);
-
-// Ruta para obtener la información de un solo producto
-Route::get('/productos/{id}/edit', [
-    ProductosController::class, 'edit'
-])->name('productos.edit');
-
-// Ruta para actualizar el producto
-Route::put('/productos/{id}', [
-    ProductosController::class, 'update'
-])->name('productos.update');
+Route::get('/catalogo', [ProductosController::class, 'catalogo'])->name('catalogo');
+Route::get('/ropa', [ProductosController::class, 'ropa'])->name('ropa');
+Route::get('/calzado', [ProductosController::class, 'calzado'])->name('calzado');
 
 // Ruta para mostrar el formulario de registro
 Route::get('/registro', [
@@ -44,30 +76,4 @@ Route::post('/acceso', [
 Route::post('/cerrar', [
     AuthController::class, 'logout'
 ])->name('cerrar');
-
-// Nuevas rutas para la sección de ventas
-Route::middleware(['auth'])->group(function () {
-    Route::get('/favoritos', function () {
-        return view('ventas.favoritos');
-    })->name('favoritos');
-
-    Route::get('/mis-compras', function () {
-        return view('ventas.compras');
-    })->name('compras');
-
-    Route::get('/carrito', function () {
-        return view('ventas.carrito');
-    })->name('carrito');
-});
-
-// Rutas públicas de catálogo
-Route::get('/catalogo', [ProductosController::class, 'catalogo'])->name('catalogo');
-Route::get('/ropa', [ProductosController::class, 'ropa'])->name('ropa');
-Route::get('/calzado', [ProductosController::class, 'calzado'])->name('calzado');
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin-dashboard', [
-        AuthController::class, 'adminDashboard'
-    ])->name('admin-dashboard');
-});
 
